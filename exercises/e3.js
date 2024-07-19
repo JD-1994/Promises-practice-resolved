@@ -14,24 +14,30 @@
  * * getPromise(num) function must be exported
  * Example: export const getPromise(num) => return <Your code of promise>
  */
-export const getPromise = () => {
-  // Your code goes here...
+// Function to return a promise if the argument is a whole number, otherwise return 0
+export const getPromise = (num) => {
+  if (Number.isInteger(num)) {
+    return new Promise((resolve) => {
+      resolve(num);
+    });
+  } else {
+    return 0;
+  }
 };
 
-/**
- * @task
- * Create a function that follows the steps:
- * * Has a name of 'updateSumValue'
- * * Takes no arguments
- * * Has a local variable with name of 'sum' and value of 2
- * * resolves the getPromise function with an argument of 120, then adds the promise value to the sum variable
- * * Synchronously adds 8 to the sum variable
- * * Returns the sum value
- * * if you have solved it successfully, the updateSumValue() function will return the value of 10;
- */
+// Function to update the sum value as described
 export const updateSumValue = () => {
-  // Your code goes here...
+  let sum = 2;
+
+  getPromise(120).then((value) => {
+    sum += value;
+  });
+
+  sum += 8;
+
+  return sum;
 };
+
 
 // === TEST YOURSELF ===
 // Once you're finished run the test with "npm run test-3"

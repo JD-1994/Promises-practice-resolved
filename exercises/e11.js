@@ -12,6 +12,7 @@
  * * Import fetch function from 'node-fetch' to use the fetch() function in code
  * * set the usersUrl constant to store the json-server 'users' endpoint path
 */
+import fetch from 'node-fetch';
 
 export const usersUrl = 'http://localhost:3000/users/';
 
@@ -25,11 +26,9 @@ export const usersUrl = 'http://localhost:3000/users/';
  * You can use loops or array methods and any function syntax. No limits!
  * Example: const getLoginList = (data) => {<Your code>}
 */
-
-const getLoginList = () => {
-  // Your code goes here...
-
-}
+const getLoginList = (data) => {
+  return data.map(item => item.login);
+};
 
 /**
  * @task 
@@ -38,25 +37,36 @@ const getLoginList = () => {
  * example: const getData = <node_fetch_function_call>
 */
 
-// Your code goes here ...
-const getData;
+const getData = fetch(usersUrl)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+    return response.json();
+  });
 
-/**
- * @task 
- * Create the result constant that stores the resolved promise value:
- * * Do not forget to convert the response to a JavaScript array when resolved
- * * Use the getLoginList() function to log the array of logins from fetched data in the console
- * * Return the array of logins when resolved 
- * Example: const result = getData
- *  .then(<Your_converting_code>)
- *  .then(<Your_logging_and_return_code>)
-*/
+ 
 
-// Your code goes here ...
-export const result = getData;
+// Process the fetched data and export the result
+export const result = getData
+  .then(data => {
+    const logins = getLoginList(data);
+    console.log(logins);
+    return logins;
+  })
+  .catch(error => {
+    console.error('Error processing data:', error);
+    throw error;
+  });
 
 
-// === TEST YOURSELF ===
-// Once you're finished run the test with "npm run test-11"
-// If the test has all tests passed, switch to the next exercise file
-// If any of the tests fails, refactor the code and run the test command after you've fixed the function
+const resolveWithMessage = () => {
+  return Promise.resolve('The PROMISE was RESOLVED')
+    .then(message => {
+      console.log(message);
+      return message;
+    });
+};
+
+
+resolveWithMessage();
