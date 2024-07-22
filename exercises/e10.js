@@ -6,12 +6,18 @@ export const getFirstResolvedPromise = (promises) => {
 export const getFirstPromiseOrFail = (promises) => {
   //*  write code to pass test ⬇ ️
   return new Promise((resolve, reject) => {
-    let rejectedCount = 0;
+    let settled = false;
+
     promises.forEach((promise) => {
-      promise.then(resolve).catch(() => {
-        rejectedCount++;
-        if (rejectedCount === promises.length) {
-          reject("All promises were rejected");
+      promise.then(result => {
+        if (!settled) {
+          settled = true;
+          resolve(result);
+        }
+      }).catch(error => {
+        if (!settled) {
+          settled = true;
+          reject(error);
         }
       });
     });
@@ -63,9 +69,14 @@ export const fetchAllCharactersByIds = async (ids) => {
   // To solve this you must fetch all characters passed in the array at the same time
   // use the `fetchCharacterById` function above to make this work
   //*  write code to pass test ⬇ ️
-  const promises = ids.map(id => fetchCharacterById(id).catch(error => error));
-  const results = await Promise.all(promises);
-  const validResults = results.filter(result => typeof result === 'object');
-  return validResults;
+  const promises = ids.map(id => fetchCharacterById(id));
+  const results = await Promise.allSettled(promises);
+
+  const hasRejected = results.some(result => result.status === 'rejected');
+  if (hasRejected) {
+    return [];
+  }
+
+  return results.map(result => result.value);
 };
 
