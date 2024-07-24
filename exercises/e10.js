@@ -6,20 +6,37 @@ export const getFirstResolvedPromise = (promises) => {
 export const getFirstPromiseOrFail = (promises) => {
   //*  write code to pass test ⬇ ️
   return new Promise((resolve, reject) => {
+    let errors = [];
     let settled = false;
 
-    promises.forEach((promise) => {
-      promise.then(result => {
-        if (!settled) {
-          settled = true;
-          resolve(result);
+    promises.forEach(promise => {
+      promise
+        .then(result => {
+          if (!settled) {
+            settled = true;
+            resolve(result);
+          }
+        })
+        .catch(error => {
+          if (!settled) {
+            settled = true;
+            reject(error);
+          } else {
+            errors.push(error);
+          }
+        });
+    });
+
+    // Extra check to handle all promises rejected
+    Promise.all(promises.map(p => p.catch(e => e))).then(results => {
+      if (!settled) {
+        const firstError = results.find(result => result instanceof Error);
+        if (firstError) {
+          reject(firstError);
+        } else {
+          resolve(results[0]);
         }
-      }).catch(error => {
-        if (!settled) {
-          settled = true;
-          reject(error);
-        }
-      });
+      }
     });
   });
 };
