@@ -5,41 +5,39 @@ export const getFirstResolvedPromise = (promises) => {
 
 export const getFirstPromiseOrFail = (promises) => {
   //*  write code to pass test ⬇ ️
+  
   return new Promise((resolve, reject) => {
-    let errors = [];
-    let settled = false;
+    // Wrap each promise to handle rejection first
+    const wrappedPromises = promises.map(promise => 
+      promise.then(
+        value => ({ status: 'fulfilled', value }),
+        error => ({ status: 'rejected', reason: error })
+      )
+    );
 
-    promises.forEach(promise => {
-      promise
-        .then(result => {
-          if (!settled) {
-            settled = true;
-            resolve(result);
-          }
-        })
-        .catch(error => {
-          if (!settled) {
-            settled = true;
-            reject(error);
-          } else {
-            errors.push(error);
-          }
-        });
-    });
-
-    // Extra check to handle all promises rejected
-    Promise.all(promises.map(p => p.catch(e => e))).then(results => {
-      if (!settled) {
-        const firstError = results.find(result => result instanceof Error);
-        if (firstError) {
-          reject(firstError);
+  
+    Promise.race(wrappedPromises)
+      .then(result => {
+        if (result.status === 'fulfilled') {
+          resolve(result.value);
         } else {
-          resolve(results[0]);
+          reject(result.reason);
+        }
+      });
+
+    
+    Promise.allSettled(promises).then(results => {
+      if (!results.some(result => result.status === 'fulfilled')) {
+        const firstRejected = results.find(result => result.status === 'rejected');
+        if (firstRejected) {
+          reject(firstRejected.reason);
         }
       }
     });
   });
-};
+  };
+  
+
 
 export const getQuantityOfRejectedPromises = async (promises) => {
   //*  write code to pass test ⬇ ️
