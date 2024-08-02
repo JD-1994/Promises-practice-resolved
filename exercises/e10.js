@@ -3,39 +3,45 @@ export const getFirstResolvedPromise = (promises) => {
   return Promise.any(promises);
 };
 
+// Input: array of promises 
+// Output: 
+
 export const getFirstPromiseOrFail = (promises) => {
   //*  write code to pass test ⬇ ️
+
+  return Promise.race(promises);
+};
   
-  return new Promise((resolve, reject) => {
-    // Wrap each promise to handle rejection first
-    const wrappedPromises = promises.map(promise => 
-      promise.then(
-        value => ({ status: 'fulfilled', value }),
-        error => ({ status: 'rejected', reason: error })
-      )
-    );
+  // return new Promise((resolve, reject) => {
+  //   // Wrap each promise to handle rejection first
+  //   const wrappedPromises = promises.map(promise => 
+  //     promise.then(
+  //       value => ({ status: 'fulfilled', value }),
+  //       error => ({ status: 'rejected', reason: error })
+  //     )
+  //   );
 
   
-    Promise.race(wrappedPromises)
-      .then(result => {
-        if (result.status === 'fulfilled') {
-          resolve(result.value);
-        } else {
-          reject(result.reason);
-        }
-      });
+    // Promise.race(wrappedPromises)
+    //   .then(result => {
+    //     if (result.status === 'fulfilled') {
+    //       resolve(result.value);
+    //     } else {
+    //       reject(result.reason);
+    //     }
+    //   });
 
     
-    Promise.allSettled(promises).then(results => {
-      if (!results.some(result => result.status === 'fulfilled')) {
-        const firstRejected = results.find(result => result.status === 'rejected');
-        if (firstRejected) {
-          reject(firstRejected.reason);
-        }
-      }
-    });
-  });
-  };
+    // Promise.allSettled(promises).then(results => {
+    //   if (!results.some(result => result.status === 'fulfilled')) {
+    //     const firstRejected = results.find(result => result.status === 'rejected');
+    //     if (firstRejected) {
+    //       reject(firstRejected.reason);
+    //     }
+    //   }
+  //   // });
+  // });
+  // };
   
 
 
